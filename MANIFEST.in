@@ -1,4 +1,21 @@
+# Include documentation
 include README.md
+include CHANGELOG.md
 include LICENSE
-recursive-include automacoes_python_base_td *.py
 
+# Include configuration files
+include pyproject.toml
+include pytest.ini
+
+# Include example files
+include example_*.py
+
+# Exclude tests from distribution
+recursive-exclude tests *
+recursive-exclude tests .*
+
+# Exclude build and cache files
+global-exclude __pycache__
+global-exclude *.py[co]
+global-exclude *.so
+global-exclude .DS_Store
