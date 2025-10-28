@@ -1,0 +1,65 @@
+"""
+Exemplo de model para o banco Automations - AutomationJob
+
+Renomeie este arquivo para automation_job.py e descomente o código para usar.
+"""
+
+# from sqlalchemy import Column, String, Integer, DateTime, Text
+# from ...base import BaseModel
+# 
+# 
+# class AutomationJob(BaseModel):
+#     """
+#     Model de Job de Automação
+#     
+#     Herda de BaseModel que já inclui:
+#     - id (Integer, primary_key)
+#     - ativo (Boolean, default=True) - usado para soft delete
+#     - created_at (DateTime)
+#     - updated_at (DateTime)
+#     """
+#     __tablename__ = "automation_jobs"
+#     
+#     name = Column(String(100), nullable=False, index=True)
+#     description = Column(Text)
+#     job_type = Column(String(50), nullable=False)  # import, export, sync, etc
+#     status = Column(String(20), default="pending")  # pending, running, completed, failed
+#     cron_expression = Column(String(50))  # Para jobs agendados
+#     last_run = Column(DateTime)
+#     next_run = Column(DateTime)
+#     execution_count = Column(Integer, default=0)
+#     success_count = Column(Integer, default=0)
+#     error_count = Column(Integer, default=0)
+#     avg_execution_time = Column(Integer)  # em segundos
+#     
+#     def __repr__(self):
+#         return f"<AutomationJob(name='{self.name}', status='{self.status}')>"
+# 
+# 
+# class AutomationLog(BaseModel):
+#     """
+#     Model de Log de Automação
+#     
+#     Herda de BaseModel que já inclui:
+#     - id (Integer, primary_key)
+#     - ativo (Boolean, default=True) - usado para soft delete
+#     - created_at (DateTime)
+#     - updated_at (DateTime)
+#     """
+#     __tablename__ = "automation_logs"
+#     
+#     job_id = Column(Integer, ForeignKey("automation_jobs.id"), index=True)
+#     level = Column(String(20), nullable=False)  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+#     message = Column(Text, nullable=False)
+#     execution_time = Column(Integer)  # em segundos
+#     records_processed = Column(Integer, default=0)
+#     records_success = Column(Integer, default=0)
+#     records_error = Column(Integer, default=0)
+#     error_details = Column(Text)
+#     
+#     # Relationship
+#     job = relationship("AutomationJob", backref="logs")
+#     
+#     def __repr__(self):
+#         return f"<AutomationLog(job_id={self.job_id}, level='{self.level}')>"
+

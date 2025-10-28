@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+recursive-include automacoes_python_base_td *.py
+

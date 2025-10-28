@@ -1,0 +1,38 @@
+"""
+Exemplo de model para o banco TDAX - Cliente
+
+Renomeie este arquivo para cliente.py e descomente o código para usar.
+"""
+
+# from sqlalchemy import Column, String, Date
+# from ...base import BaseModel
+# 
+# 
+# class Cliente(BaseModel):
+#     """
+#     Model de Cliente do banco TDAX
+#     
+#     Herda de BaseModel que já inclui:
+#     - id (Integer, primary_key)
+#     - ativo (Boolean, default=True) - usado para soft delete
+#     - created_at (DateTime)
+#     - updated_at (DateTime)
+#     """
+#     __tablename__ = "tdax_clientes"
+#     
+#     codigo = Column(String(20), unique=True, nullable=False, index=True)
+#     nome = Column(String(100), nullable=False)
+#     nome_fantasia = Column(String(100))
+#     cpf_cnpj = Column(String(18), unique=True)
+#     email = Column(String(100))
+#     telefone = Column(String(20))
+#     celular = Column(String(20))
+#     endereco = Column(String(200))
+#     cidade = Column(String(100))
+#     estado = Column(String(2))
+#     cep = Column(String(10))
+#     data_cadastro = Column(Date)
+#     
+#     def __repr__(self):
+#         return f"<Cliente(codigo='{self.codigo}', nome='{self.nome}')>"
+
