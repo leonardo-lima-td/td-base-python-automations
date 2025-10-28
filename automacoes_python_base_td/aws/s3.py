@@ -4,6 +4,7 @@ Cliente S3
 from typing import Optional, Dict, List
 from botocore.exceptions import ClientError
 from .client import AWSClient
+from ..core.exceptions import S3Exception
 
 
 class S3Client(AWSClient):
@@ -47,8 +48,10 @@ class S3Client(AWSClient):
             self.client.upload_file(file_path, bucket, key, ExtraArgs=extra_args)
             return True
         except ClientError as e:
-            print(f"Erro ao fazer upload: {e}")
-            return False
+            raise S3Exception(
+                f"Erro ao fazer upload para S3",
+                details={"file": file_path, "bucket": bucket, "key": key, "error": str(e)}
+            ) from e
     
     def download_file(self, bucket: str, key: str, file_path: str) -> bool:
         """

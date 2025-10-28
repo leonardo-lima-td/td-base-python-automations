@@ -5,6 +5,7 @@ from typing import TypeVar, Generic, Type, Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 from ..base import Base
+from ...core.exceptions import DatabaseQueryError, ModelNotFoundError
 
 
 ModelType = TypeVar("ModelType", bound=Base)
@@ -147,7 +148,10 @@ class CRUDBase(Generic[ModelType]):
             return obj
         except SQLAlchemyError as e:
             session.rollback()
-            raise e
+            raise DatabaseQueryError(
+                f"Erro ao criar {self.model.__name__}",
+                details={"model": self.model.__name__, "data": data, "error": str(e)}
+            ) from e
     
     def create_many(self, session: Session, data_list: List[Dict[str, Any]]) -> List[ModelType]:
         """
@@ -193,16 +197,23 @@ class CRUDBase(Generic[ModelType]):
         """
         try:
             obj = self.get(session, id)
-            if obj:
-                for key, value in data.items():
-                    if hasattr(obj, key):
-                        setattr(obj, key, value)
-                session.commit()
-                session.refresh(obj)
+            if not obj:
+                raise ModelNotFoundError(self.model.__name__, id)
+            
+            for key, value in data.items():
+                if hasattr(obj, key):
+                    setattr(obj, key, value)
+            session.commit()
+            session.refresh(obj)
             return obj
+        except ModelNotFoundError:
+            raise
         except SQLAlchemyError as e:
             session.rollback()
-            raise e
+            raise DatabaseQueryError(
+                f"Erro ao atualizar {self.model.__name__}",
+                details={"model": self.model.__name__, "id": id, "data": data, "error": str(e)}
+            ) from e
     
     def delete(self, session: Session, id: int) -> bool:
         """
@@ -220,18 +231,27 @@ class CRUDBase(Generic[ModelType]):
         """
         try:
             obj = self.get(session, id)
-            if obj:
-                if hasattr(obj, 'ativo'):
-                    obj.ativo = False
-                    session.commit()
-                    session.refresh(obj)
-                    return True
-                else:
-                    raise ValueError(f"Model {self.model.__name__} não possui coluna 'ativo' para soft delete")
-            return False
+            if not obj:
+                raise ModelNotFoundError(self.model.__name__, id)
+            
+            if not hasattr(obj, 'ativo'):
+                raise DatabaseQueryError(
+                    f"Model {self.model.__name__} não possui coluna 'ativo' para soft delete",
+                    details={"model": self.model.__name__, "id": id}
+                )
+            
+            obj.ativo = False
+            session.commit()
+            session.refresh(obj)
+            return True
+        except (ModelNotFoundError, DatabaseQueryError):
+            raise
         except SQLAlchemyError as e:
             session.rollback()
-            raise e
+            raise DatabaseQueryError(
+                f"Erro ao deletar {self.model.__name__}",
+                details={"model": self.model.__name__, "id": id, "error": str(e)}
+            ) from e
     
     def count(self, session: Session, include_inactive: bool = False, **filters) -> int:
         """

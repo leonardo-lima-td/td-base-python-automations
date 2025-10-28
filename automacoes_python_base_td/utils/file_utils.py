@@ -4,7 +4,6 @@ Utilitários para manipulação de arquivos e diretórios
 import os
 import shutil
 from typing import List, Optional
-from pathlib import Path
 
 
 def listdir(path: str, filter_ext: Optional[str] = None) -> List[str]:

@@ -7,6 +7,7 @@ from contextlib import contextmanager
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from ..settings import DatabaseSettings
+from ..core.exceptions import DatabaseConnectionError, DatabaseQueryError
 
 
 class DatabaseConnection:
@@ -43,15 +44,26 @@ class DatabaseConnection:
     
     def connect(self):
         """Estabelece conexão com o banco de dados"""
-        if self._connection is None or self._connection.closed:
-            self._connection = psycopg2.connect(
-                host=self.host,
-                port=self.port,
-                database=self.database,
-                user=self.user,
-                password=self.password
-            )
-        return self._connection
+        try:
+            if self._connection is None or self._connection.closed:
+                self._connection = psycopg2.connect(
+                    host=self.host,
+                    port=self.port,
+                    database=self.database,
+                    user=self.user,
+                    password=self.password
+                )
+            return self._connection
+        except psycopg2.Error as e:
+            raise DatabaseConnectionError(
+                f"Falha ao conectar ao banco de dados",
+                details={
+                    "host": self.host,
+                    "port": self.port,
+                    "database": self.database,
+                    "error": str(e)
+                }
+            ) from e
     
     def close(self):
         """Fecha a conexão com o banco de dados"""
@@ -83,13 +95,19 @@ def get_connection(
             results = cursor.fetchall()
     """
     db = DatabaseConnection(host, port, database, user, password)
-    conn = db.connect()
     try:
+        conn = db.connect()
         yield conn
         conn.commit()
-    except Exception as e:
-        conn.rollback()
-        raise e
+    except psycopg2.Error as e:
+        if conn:
+            conn.rollback()
+        raise DatabaseQueryError(
+            "Erro ao executar operação no banco",
+            details={"error": str(e)}
+        ) from e
+    except DatabaseConnectionError:
+        raise
     finally:
         db.close()
 
@@ -102,11 +120,19 @@ def execute_query(
     """
     Executa uma query SQL (INSERT, UPDATE, DELETE) e retorna o número de linhas afetadas.
     """
-    connection_params = connection_params or {}
-    with get_connection(**connection_params) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute(query, params)
-            return cursor.rowcount
+    try:
+        connection_params = connection_params or {}
+        with get_connection(**connection_params) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, params)
+                return cursor.rowcount
+    except (DatabaseConnectionError, DatabaseQueryError):
+        raise
+    except Exception as e:
+        raise DatabaseQueryError(
+            "Erro ao executar query",
+            details={"query": query[:100], "error": str(e)}
+        ) from e
 
 
 def execute_many(

@@ -2,6 +2,7 @@
 Exceções customizáveis para o pacote
 """
 from typing import Optional, Dict, Any
+from loguru import logger
 
 
 class BaseAppException(Exception):
@@ -28,11 +29,28 @@ class BaseAppException(Exception):
         message: str,
         code: Optional[str] = None,
         details: Optional[Dict[str, Any]] = None,
+        log_error: bool = True,
     ):
         self.message = message
         self.code = code
         self.details = details or {}
+        
+        # Log automático do erro
+        if log_error:
+            self._log_error()
+        
         super().__init__(self.message)
+    
+    def _log_error(self):
+        """Emite log de erro automaticamente"""
+        log_msg = self.message
+        if self.code:
+            log_msg = f"[{self.code}] {log_msg}"
+        
+        logger.error(
+            f"{self.__class__.__name__}: {log_msg}",
+            extra={"code": self.code, "details": self.details}
+        )
     
     def __str__(self):
         parts = [self.message]

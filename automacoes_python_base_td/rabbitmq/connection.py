@@ -6,6 +6,7 @@ from typing import Optional
 import pika
 from pika.exceptions import AMQPConnectionError
 from ..settings import RabbitMQSettings
+from ..core.exceptions import RabbitMQConnectionError
 
 
 class RabbitMQConnection:
@@ -56,8 +57,15 @@ class RabbitMQConnection:
             self.channel = self.connection.channel()
             return True
         except AMQPConnectionError as e:
-            print(f"Erro ao conectar ao RabbitMQ: {e}")
-            return False
+            raise RabbitMQConnectionError(
+                "Falha ao conectar ao RabbitMQ",
+                details={
+                    "host": self.host,
+                    "port": self.port,
+                    "vhost": self.virtual_host,
+                    "error": str(e)
+                }
+            ) from e
     
     def close(self):
         """Fecha a conexão"""
