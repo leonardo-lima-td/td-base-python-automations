@@ -302,14 +302,24 @@ def crud_factory(model: Type[ModelType]) -> CRUDBase[ModelType]:
         Instância de CRUDBase configurada para o model
     
     Exemplo:
-        from models import User, Product
+        from automacoes_python_base_td import crud_factory, get_session
+        from models import Cliente, AutomationJob
         
-        user_crud = crud_factory(User)
-        product_crud = crud_factory(Product)
+        # Criar CRUDs
+        cliente_crud = crud_factory(Cliente)
+        job_crud = crud_factory(AutomationJob)
         
-        with get_session() as session:
-            user = user_crud.get(session, id=1)
-            products = product_crud.get_all(session)
+        # Usar com session manual
+        with get_session("tdax") as session:
+            # TDAX
+            cliente = cliente_crud.get(session, id=1)
+            clientes = cliente_crud.get_all(session)
+            novo_cliente = cliente_crud.create(session, {"nome": "João"})
+        
+        with get_session("automations") as session:
+            # Automations
+            jobs = job_crud.get_all(session)
+            job = job_crud.create(session, {"name": "Import Data"})
     """
     return CRUDBase(model)
 

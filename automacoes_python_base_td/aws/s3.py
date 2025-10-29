@@ -140,15 +140,6 @@ class S3Client(AWSClient):
             print(f"Erro ao listar arquivos: {e}")
             return []
     
-    def delete_file(self, bucket: str, key: str) -> bool:
-        """Deleta um arquivo do S3"""
-        try:
-            self.client.delete_object(Bucket=bucket, Key=key)
-            return True
-        except ClientError as e:
-            print(f"Erro ao deletar arquivo: {e}")
-            return False
-    
     def file_exists(self, bucket: str, key: str) -> bool:
         """Verifica se um arquivo existe no S3"""
         try:

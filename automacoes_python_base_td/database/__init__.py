@@ -14,30 +14,21 @@ from .connection import (
 # SQLAlchemy - Base e BaseModel
 from .models.base import Base, BaseModel
 
-# SQLAlchemy - Session Managers
+# SQLAlchemy - Session Manager Unificado
 from .session import (
-    # Gerenciadores
+    DatabaseType,
     DatabaseSessionManager,
-    TdaxSessionManager,
-    AutomationsSessionManager,
-    # Inicialização
-    init_tdax_db,
-    init_automations_db,
-    init_all_databases,
-    # Obter managers
-    get_tdax_manager,
-    get_automations_manager,
-    # Sessões
+    get_manager,
+    get_session,
+    # Aliases para compatibilidade
     get_tdax_session,
     get_automations_session,
+    get_tdax_manager,
+    get_automations_manager,
     # FastAPI Dependencies
+    get_db_dependency,
     get_tdax_db_dependency,
     get_automations_db_dependency,
-    # Compatibilidade (deprecated)
-    init_db,
-    get_db_manager,
-    get_session,
-    get_db_dependency,
 )
 
 # Repositories CRUD
@@ -54,28 +45,20 @@ __all__ = [
     # SQLAlchemy - Base
     "Base",
     "BaseModel",
-    # SQLAlchemy - Gerenciadores
+    # SQLAlchemy - Session Manager
+    "DatabaseType",
     "DatabaseSessionManager",
-    "TdaxSessionManager",
-    "AutomationsSessionManager",
-    # SQLAlchemy - Inicialização
-    "init_tdax_db",
-    "init_automations_db",
-    "init_all_databases",
-    # SQLAlchemy - Obter Managers
-    "get_tdax_manager",
-    "get_automations_manager",
-    # SQLAlchemy - Sessões
+    "get_manager",
+    "get_session",
+    # SQLAlchemy - Aliases (compatibilidade)
     "get_tdax_session",
     "get_automations_session",
+    "get_tdax_manager",
+    "get_automations_manager",
     # SQLAlchemy - FastAPI
+    "get_db_dependency",
     "get_tdax_db_dependency",
     "get_automations_db_dependency",
-    # SQLAlchemy - Compatibilidade (deprecated)
-    "init_db",
-    "get_db_manager",
-    "get_session",
-    "get_db_dependency",
     # CRUD
     "CRUDBase",
     "crud_factory",

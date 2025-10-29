@@ -53,14 +53,22 @@ from .database import (
     fetch_all,
     fetch_one,
     DatabaseConnection,
-    # SQLAlchemy
+    # SQLAlchemy - Base
     Base,
     BaseModel,
+    # SQLAlchemy - Session Manager
+    DatabaseType,
     DatabaseSessionManager,
-    init_db,
-    get_db_manager,
+    get_manager,
     get_session,
+    get_tdax_session,
+    get_automations_session,
+    get_tdax_manager,
+    get_automations_manager,
+    # SQLAlchemy - FastAPI
     get_db_dependency,
+    get_tdax_db_dependency,
+    get_automations_db_dependency,
     # CRUD
     CRUDBase,
     crud_factory,
@@ -159,14 +167,22 @@ __all__ = [
     "fetch_all",
     "fetch_one",
     "DatabaseConnection",
-    # Database - SQLAlchemy
+    # Database - SQLAlchemy Base
     "Base",
     "BaseModel",
+    # Database - Session Manager
+    "DatabaseType",
     "DatabaseSessionManager",
-    "init_db",
-    "get_db_manager",
+    "get_manager",
     "get_session",
+    "get_tdax_session",
+    "get_automations_session",
+    "get_tdax_manager",
+    "get_automations_manager",
+    # Database - FastAPI
     "get_db_dependency",
+    "get_tdax_db_dependency",
+    "get_automations_db_dependency",
     # Database - CRUD
     "CRUDBase",
     "crud_factory",

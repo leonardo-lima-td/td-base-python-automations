@@ -60,7 +60,7 @@ def capitalize_words(text: str) -> str:
     return ' '.join(word.capitalize() for word in text.split())
 
 
-def remover_acentos(txt: str) -> str:
+def remove_accents(txt: str) -> str:
     """
     Remove acentos de uma string.
     
