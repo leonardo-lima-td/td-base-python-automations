@@ -1,0 +1,152 @@
+═══════════════════════════════════════════════════════════════════════
+  ESTRUTURA DO PROJETO - AUTOMACOES-PYTHON-BASE-TD
+═══════════════════════════════════════════════════════════════════════
+
+python-base-TD/
+│
+├── 📋 DOCUMENTAÇÃO
+│   ├── README.md                      # Documentação principal do projeto
+│   ├── QUICK_START.md                 # Guia rápido de início
+│   ├── LICENSE                        # Licença MIT
+│   └── PROJECT_STRUCTURE.txt          # Este arquivo
+│
+├── 🔧 CONFIGURAÇÃO
+│   ├── pyproject.toml                 # Configuração do projeto (PEP 518)
+│   ├── pytest.ini                     # Configuração do pytest
+│   ├── MANIFEST.in                    # Arquivos para distribuição
+│   ├── .gitignore                     # Arquivos ignorados pelo git
+│   └── setup.py                       # Setup legado (compatibilidade)
+│
+├── 🚀 SCRIPTS EXECUTÁVEIS
+│   ├── build.sh                       # Script de build completo
+│   └── run_tests.sh                   # Script para rodar testes
+│
+├── 📦 EXEMPLOS DE USO
+│   ├── example_usage.py               # Exemplo básico de uso
+│   ├── example_modular.py             # Exemplo da estrutura modular
+│   ├── example_exceptions.py          # Exemplo de exceções e logging
+│   ├── examples_advanced.py           # Exemplos avançados
+│   └── test_installation.py           # Teste de instalação
+│
+└── 📂 CÓDIGO-FONTE (automacoes_python_base_td/)
+    |
+    ├── __init__.py                    # Exports principais do pacote
+    |
+    ├── core/                          # 🎯 Núcleo (Exceções)
+    |   ├── __init__.py
+    |   └── exceptions.py              # Sistema de exceções com logging
+    |
+    ├── database/                      # 💾 Database
+    |   ├── __init__.py
+    |   ├── connection.py              # Conexões PostgreSQL (psycopg2)
+    |   ├── base.py                    # Base e BaseModel do SQLAlchemy
+    |   ├── session.py                 # Gerenciadores de sessão (TDAX/Automations)
+    |   │
+    |   ├── models/                    # Models do banco
+    |   │   ├── __init__.py
+    |   │   ├── tdax/                  # Models do banco TDAX
+    |   |   ├── __init__.py
+    |   |   └── example_cliente.py.example
+    |   │   └── automations/           # Models do banco Automations
+    |   │       ├── __init__.py
+    |   │       └── example_automation_job.py.example
+    |   │
+    |   └── queries/                   # Queries genéricas
+    |       ├── __init__.py
+    |       └── crud.py                # CRUD genérico (plug & play)
+    |
+    ├── aws/                           # ☁️ AWS
+    |   ├── __init__.py
+    |   ├── client.py                  # Cliente base AWS
+    |   ├── s3.py                      # Operações S3
+    |   └── cloudwatch.py              # Operações CloudWatch
+    |
+    ├── rabbitmq/                      # 🐰 RabbitMQ
+    |   ├── __init__.py
+    |   ├── connection.py              # Conexão base RabbitMQ
+    |   ├── publisher.py               # Publisher de mensagens
+    |   └── consumer.py                # Consumer de mensagens
+    |
+    ├── logger/                        # 📝 Logger
+    |   ├── __init__.py
+    |   └── config.py                  # Configuração Loguru
+    |
+    ├── settings/                      # ⚙️ Settings (Pydantic)
+    |   ├── __init__.py
+    |   ├── base.py                    # Settings base
+    |   ├── database.py                # Settings de database
+    |   ├── aws.py                     # Settings de AWS
+    |   ├── rabbitmq.py                # Settings de RabbitMQ
+    |   └── logger.py                  # Settings de logger
+    |
+    └── utils/                         # 🔧 Utilitários
+        ├── __init__.py
+        ├── file_utils.py              # Utilitários de arquivo
+        ├── string_utils.py            # Utilitários de string
+        └── date_utils.py              # Utilitários de data
+
+═══════════════════════════════════════════════════════════════════════
+  ESTATÍSTICAS DO PROJETO
+═══════════════════════════════════════════════════════════════════════
+
+📊 Código-Fonte:
+  - 32 arquivos Python
+  - ~3,500 linhas de código
+  - 7 módulos principais
+  - 17 exceções customizadas
+
+🧪 Testes:
+  - 21 arquivos de teste
+  - 1,603 linhas de teste
+  - 70+ testes unitários
+  - Cobertura: Funcionalidade, Exceções, Logging
+
+📚 Documentação:
+  - 4 arquivos Markdown
+  - 3 arquivos TXT
+  - Exemplos de uso
+  - Guia rápido
+
+🚀 Scripts:
+  - build.sh         # Build completo
+  - run_tests.sh     # Execução de testes
+
+═══════════════════════════════════════════════════════════════════════
+  COMANDOS PRINCIPAIS
+═══════════════════════════════════════════════════════════════════════
+
+🔨 BUILD:
+  ./build.sh all          # Build completo (recomendado)
+  ./build.sh clean        # Limpa arquivos de build
+  ./build.sh build        # Constrói o pacote
+  ./build.sh install      # Instala localmente
+
+🧪 TESTES:
+  ./run_tests.sh all      # Todos os testes
+  ./run_tests.sh core     # Testes de exceções
+  ./run_tests.sh database # Testes de database
+  ./run_tests.sh coverage # Com cobertura
+
+📦 INSTALAÇÃO:
+  pip install -e .        # Modo desenvolvimento
+  pip install -e ".[dev]" # Com dependências de dev
+
+═══════════════════════════════════════════════════════════════════════
+  RECURSOS PRINCIPAIS
+═══════════════════════════════════════════════════════════════════════
+
+✅ Exceções com logging automático
+✅ Conexões PostgreSQL (psycopg2)
+✅ SQLAlchemy com CRUD genérico
+✅ Múltiplas sessões (TDAX + Automations)
+✅ Soft delete (marca ativo=False)
+✅ Cliente AWS (S3 + CloudWatch)
+✅ RabbitMQ (Publisher + Consumer)
+✅ Logger Loguru (apenas console)
+✅ Pydantic Settings v2
+✅ Utilitários (file, string, date)
+✅ Testes completos com fixtures
+✅ Scripts de build e teste
+
+═══════════════════════════════════════════════════════════════════════
+
