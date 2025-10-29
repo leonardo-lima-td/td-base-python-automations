@@ -18,6 +18,7 @@ def slugify(text: str) -> str:
     Exemplo:
         slug = slugify("Hello World! 123")  # "hello-world-123"
     """
+    text = remove_accents(text)  # Remove acentos primeiro
     text = text.lower().strip()
     text = re.sub(r'[^\w\s-]', '', text)
     text = re.sub(r'[-\s]+', '-', text)

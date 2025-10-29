@@ -6,8 +6,8 @@ import pytest
 from unittest.mock import MagicMock, Mock
 from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.exc import SQLAlchemyError
-from automacoes_python_base_td.database.base import Base
-from automacoes_python_base_td.database.queries.crud import CRUDBase, crud_factory
+from automacoes_python_base_td.database.models.base import Base
+from automacoes_python_base_td.database.repositories.crud import CRUDBase, crud_factory
 from automacoes_python_base_td.core.exceptions import (
     DatabaseQueryError,
     ModelNotFoundError,
@@ -80,10 +80,10 @@ class TestCRUDBase:
         mock_session.commit.assert_called_once()
         mock_session.refresh.assert_called_once()
     
-    def test_create_failure_raises_exception(self, caplog):
+    def test_create_failure_raises_exception(self, loguru_caplog):
         """Testa se erro ao criar lança DatabaseQueryError"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
         mock_session = MagicMock()
         # Simula erro SQLAlchemy
@@ -104,7 +104,7 @@ class TestCRUDBase:
         assert "TestUser" in exc.message
         
         # Verifica log
-        assert any("DatabaseQueryError" in record.message for record in caplog.records)
+        assert any("DatabaseQueryError" in record.message for record in loguru_caplog.records)
     
     def test_update_success(self):
         """Testa atualização de registro"""
@@ -122,10 +122,10 @@ class TestCRUDBase:
         mock_session.commit.assert_called_once()
         assert result.name == "New Name"
     
-    def test_update_not_found_raises_exception(self, caplog):
+    def test_update_not_found_raises_exception(self, loguru_caplog):
         """Testa se update de registro inexistente lança ModelNotFoundError"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
         mock_session = MagicMock()
         mock_query = MagicMock()
@@ -143,12 +143,12 @@ class TestCRUDBase:
         assert exc.details["id"] == 999
         
         # Verifica log
-        assert any("ModelNotFoundError" in record.message for record in caplog.records)
+        assert any("ModelNotFoundError" in record.message for record in loguru_caplog.records)
     
-    def test_delete_soft_delete(self, caplog):
+    def test_delete_soft_delete(self, loguru_caplog):
         """Testa soft delete (marca ativo=False)"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
         mock_session = MagicMock()
         mock_query = MagicMock()
@@ -165,10 +165,10 @@ class TestCRUDBase:
         assert user.ativo is False
         mock_session.commit.assert_called_once()
     
-    def test_delete_not_found_raises_exception(self, caplog):
+    def test_delete_not_found_raises_exception(self, loguru_caplog):
         """Testa se delete de registro inexistente lança ModelNotFoundError"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
         mock_session = MagicMock()
         mock_query = MagicMock()
@@ -185,7 +185,7 @@ class TestCRUDBase:
         assert exc.code == "MODEL_NOT_FOUND"
         
         # Verifica log
-        assert any("ModelNotFoundError" in record.message for record in caplog.records)
+        assert any("ModelNotFoundError" in record.message for record in loguru_caplog.records)
     
     def test_count_active_only(self):
         """Testa count retorna apenas ativos por padrão"""

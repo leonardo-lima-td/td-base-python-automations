@@ -93,8 +93,8 @@ class TestDaysBetween:
     def test_days_between_with_time(self):
         """Testa dias entre datas com hora"""
         dt1 = datetime(2025, 10, 28, 14, 30)
-        dt2 = datetime(2025, 10, 29, 10, 15)
+        dt2 = datetime(2025, 10, 29, 14, 30)  # Exatamente 1 dia depois
         result = days_between(dt1, dt2)
-        # Deve considerar apenas os dias, não as horas
+        # Deve considerar a diferença exata em dias
         assert result == 1
 

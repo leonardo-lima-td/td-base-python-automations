@@ -49,10 +49,10 @@ class TestRabbitMQConnection:
         assert conn.channel == mock_channel
     
     @patch('pika.BlockingConnection')
-    def test_connect_failure_raises_exception(self, mock_blocking_connection, caplog):
+    def test_connect_failure_raises_exception(self, mock_blocking_connection, loguru_caplog):
         """Testa se falha na conexão lança RabbitMQConnectionError"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
         # Simula erro de conexão
         mock_blocking_connection.side_effect = AMQPConnectionError("Connection refused")
@@ -73,7 +73,7 @@ class TestRabbitMQConnection:
         assert exc.details["host"] == "localhost"
         
         # Verifica log
-        assert any("RabbitMQConnectionError" in record.message for record in caplog.records)
+        assert any("RabbitMQConnectionError" in record.message for record in loguru_caplog.records)
     
     @patch('pika.BlockingConnection')
     def test_close_connection(self, mock_blocking_connection):

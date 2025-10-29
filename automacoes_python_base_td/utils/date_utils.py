@@ -59,14 +59,15 @@ def days_between(date1: datetime, date2: datetime) -> int:
         date2: Data final
     
     Returns:
-        Número de dias
+        Número de dias (negativo se date2 < date1)
     
     Exemplo:
         from datetime import datetime
         d1 = datetime(2025, 10, 1)
         d2 = datetime(2025, 10, 28)
         days = days_between(d1, d2)  # 27
+        days = days_between(d2, d1)  # -27
     """
     delta = date2 - date1
-    return abs(delta.days)
+    return delta.days
 

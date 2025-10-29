@@ -34,10 +34,10 @@ class TestS3Client:
         mock_client.upload_file.assert_called_once()
     
     @patch('boto3.client')
-    def test_upload_file_failure_raises_exception(self, mock_boto_client, caplog):
+    def test_upload_file_failure_raises_exception(self, mock_boto_client, loguru_caplog):
         """Testa se erro no upload lança S3Exception"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
         mock_client = MagicMock()
         # Simula erro do boto3
@@ -62,7 +62,7 @@ class TestS3Client:
         assert "key" in exc.details
         
         # Verifica log
-        assert any("S3Exception" in record.message for record in caplog.records)
+        assert any("S3Exception" in record.message for record in loguru_caplog.records)
     
     @patch('boto3.client')
     def test_upload_with_metadata(self, mock_boto_client):

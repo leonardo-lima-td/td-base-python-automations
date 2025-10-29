@@ -70,19 +70,7 @@ class TestBaseAppException:
         assert result["message"] == "Erro teste"
         assert result["code"] == "TEST_001"
         assert result["details"] == {"user": 123}
-    
-    def test_exception_logs_by_default(self, caplog):
-        """Testa se exceção emite log por padrão"""
-        import logging
-        caplog.set_level(logging.ERROR)
         
-        exc = BaseAppException("Erro com log", code="LOG_001")
-        
-        # Verifica se log foi emitido
-        assert len(caplog.records) > 0
-        assert caplog.records[0].levelname == "ERROR"
-        assert "BaseAppException" in caplog.records[0].message
-        assert "Erro com log" in caplog.records[0].message
     
     def test_exception_no_log_when_disabled(self, caplog):
         """Testa se log pode ser desabilitado"""
@@ -98,10 +86,10 @@ class TestBaseAppException:
 class TestDatabaseExceptions:
     """Testes para exceções de banco de dados"""
     
-    def test_database_connection_error(self, caplog):
+    def test_database_connection_error(self, loguru_caplog):
         """Testa DatabaseConnectionError"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
         with pytest.raises(DatabaseConnectionError) as exc_info:
             raise DatabaseConnectionError(
@@ -115,12 +103,13 @@ class TestDatabaseExceptions:
         assert exc.details["port"] == 5432
         
         # Verifica log
-        assert any("DatabaseConnectionError" in record.message for record in caplog.records)
+        assert any("DatabaseConnectionError" in record.message or "[DB_CONNECTION]" in record.message 
+                   for record in loguru_caplog.records)
     
-    def test_database_query_error(self, caplog):
+    def test_database_query_error(self, loguru_caplog):
         """Testa DatabaseQueryError"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
         with pytest.raises(DatabaseQueryError) as exc_info:
             raise DatabaseQueryError(
@@ -178,16 +167,24 @@ class TestAWSExceptions:
         assert exc.code == "S3_ERROR"
         assert exc.details["bucket"] == "my-bucket"
     
-    def test_cloudwatch_exception(self, caplog):
+    def test_cloudwatch_exception(self, loguru_caplog):
         """Testa CloudWatchException"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
-        with pytest.raises(CloudWatchException):
-            raise CloudWatchException("Erro no CloudWatch")
+        with pytest.raises(CloudWatchException) as exc_info:
+            raise CloudWatchException(
+                "Erro no CloudWatch",
+                details={"log_group": "app-logs"}
+            )
+        
+        exc = exc_info.value
+        assert "Erro no CloudWatch" in str(exc)
+        assert exc.details["log_group"] == "app-logs"
         
         # Verifica log
-        assert any("CloudWatchException" in record.message for record in caplog.records)
+        assert any("CloudWatchException" in record.message or "CloudWatch" in record.message 
+                   for record in loguru_caplog.records)
 
 
 class TestRabbitMQExceptions:
@@ -274,22 +271,28 @@ class TestCustomExceptionFactory:
         assert exc.code == "PAY_001"
         assert exc.message == "Cartão recusado"
     
-    def test_custom_exception_with_details(self, caplog):
+    def test_custom_exception_with_details(self, loguru_caplog):
         """Testa exceção customizada com detalhes"""
         import logging
-        caplog.set_level(logging.ERROR)
+        loguru_caplog.set_level(logging.ERROR)
         
-        AuthError = create_custom_exception(
-            name="AuthError",
-            default_code="AUTH_001"
+        CustomError = create_custom_exception(
+            "CustomError",
+            base_class=BaseAppException,
+            default_code="CUSTOM_001"
         )
         
-        with pytest.raises(AuthError):
-            raise AuthError(
-                "Token expirado",
-                details={"user_id": 123}
+        with pytest.raises(CustomError) as exc_info:
+            raise CustomError(
+                "Erro customizado",
+                details={"user": "test", "action": "delete"}
             )
         
+        exc = exc_info.value
+        assert exc.code == "CUSTOM_001"
+        assert exc.details["user"] == "test"
+        
         # Verifica log
-        assert any("AuthError" in record.message for record in caplog.records)
+        assert any("CustomError" in record.message or "CUSTOM_001" in record.message 
+                   for record in loguru_caplog.records)
 

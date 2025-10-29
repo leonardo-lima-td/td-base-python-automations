@@ -5,6 +5,8 @@ import pytest
 from unittest.mock import Mock, MagicMock
 import psycopg2
 import pika
+from loguru import logger
+import sys
 
 
 # Fixtures para captura de logs
@@ -14,6 +16,43 @@ def capture_logs(caplog):
     import logging
     caplog.set_level(logging.ERROR)
     return caplog
+
+
+@pytest.fixture
+def loguru_caplog(caplog):
+    """
+    Fixture para capturar logs do loguru via pytest caplog
+    """
+    import logging
+    
+    # Remove handlers padrão do loguru
+    logger.remove()
+    
+    # Adiciona handler que propaga para o logging padrão
+    handler_id = logger.add(
+        lambda msg: caplog.handler.emit(
+            logging.LogRecord(
+                name="loguru",
+                level=logging.ERROR,
+                pathname="",
+                lineno=0,
+                msg=msg,
+                args=(),
+                exc_info=None
+            )
+        ),
+        format="{message}",
+        level="ERROR",
+        catch=False
+    )
+    
+    yield caplog
+    
+    # Remove o handler após o teste
+    logger.remove(handler_id)
+    
+    # Restaura o handler padrão (stderr)
+    logger.add(sys.stderr, level="ERROR")
 
 
 # Fixtures para mock de banco de dados

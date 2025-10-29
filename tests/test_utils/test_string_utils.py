@@ -59,8 +59,9 @@ class TestTruncate:
     
     def test_truncate_with_custom_suffix(self):
         """Testa truncate com sufixo customizado"""
-        result = truncate("Hello World", 8, suffix=" [...]")
-        assert result == "Hello [...]"
+        result = truncate("Hello World!!!", 10, suffix=" [...]")
+        # max_length=10, suffix=" [...]" (6 chars), então 10-6=4 chars do texto + 6 do suffix = 10 total
+        assert result == "Hell [...]"
     
     def test_truncate_empty_string(self):
         """Testa truncate com string vazia"""

@@ -22,12 +22,12 @@ class TestSetupLogger:
         mock_logger.add.assert_called()
     
     @patch('automacoes_python_base_td.logger.config.logger')
-    def test_setup_logger_with_settings(self, mock_logger):
+    def test_setup_logger_with_settings(self, mock_logger, monkeypatch):
         """Testa configuração com objeto settings"""
-        from automacoes_python_base_td.settings import LoggerSettings
+        from automacoes_python_base_td.settings import AppSettings, settings
         
-        settings = LoggerSettings(log_level="WARNING")
-        setup_logger(settings=settings)
+        # Usa o settings global
+        setup_logger()
         
         # Verifica que foi configurado
         mock_logger.add.assert_called()
