@@ -6,8 +6,9 @@ from datetime import datetime
 from typing import Optional, Literal
 from pydantic import Field, computed_field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv
 
-
+load_dotenv()
 class AppSettings(BaseSettings):
     """
     Configurações unificadas da aplicação.
@@ -251,27 +252,11 @@ class AppSettings(BaseSettings):
 settings = AppSettings()
 
 if __name__ == "__main__":
-    print(settings.dump())
-    # print(settings.env)
-    # print(settings.log_destination)
-    # print(settings.log_stream_name)
-    # print(settings.postgres_url)
-    # print(settings.tdax_url)
-    # print(settings.automations_url)
-    # print(settings.rabbitmq_connection_url)
-    # print(settings.is_development)
-    # print(settings.is_production)
-    # print(settings.is_staging)
-    # print(settings.use_cloudwatch)
-    # print(settings.effective_log_level)
-    # print(settings.log_format)
-    # print(settings.log_level)
-    # print(settings.log_destination)
-    # print(settings.log_stream_name)
-    # print(settings.postgres_url)
-    # print(settings.tdax_url)
-    # print(settings.automations_url)
+    import json
 
+    full = settings.model_dump(mode='json') 
+    print(json.dumps(full, indent=2)) # printa o json completo
+    
 
 __all__ = ["AppSettings", "settings"]
 
