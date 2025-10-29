@@ -51,11 +51,6 @@ class AppSettings(BaseSettings):
     db_password: str
     db_name: str = Field(default="tdax")
     
-    # SQLAlchemy - URLs customizadas (opcional)
-    database_url: Optional[str] = Field(default=None)
-    database_url_tdax: Optional[str] = Field(default=None)
-    database_url_automation: Optional[str] = Field(default=None)
-    
     # ==========================================
     # AWS
     # ==========================================
@@ -128,26 +123,20 @@ class AppSettings(BaseSettings):
     
     @computed_field
     @property
-    def postgres_url(self) -> str:
+    def database_url(self) -> str:
         """Constrói a URL do PostgreSQL"""
-        if self.database_url:
-            return self.database_url
         return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/{self.db_name}"
     
     @computed_field
     @property
-    def tdax_url(self) -> str:
+    def database_url_tdax(self) -> str:
         """URL do banco TDAX"""
-        if self.database_url_tdax:
-            return self.database_url_tdax
         return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/tdax"
     
     @computed_field
     @property
-    def automations_url(self) -> str:
+    def database_url_automation(self) -> str:
         """URL do banco Automations"""
-        if self.database_url_automation:
-            return self.database_url_automation
         return f"postgresql://{self.db_user}:{self.db_password}@{self.db_host}:{self.db_port}/automacoes"
     
     # ==========================================
