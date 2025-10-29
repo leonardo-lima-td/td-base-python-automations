@@ -1,8 +1,7 @@
 """
-Gerenciamento de sessões SQLAlchemy - TDAX e Automations
+Gerenciamento de sessões SQLAlchemy - Unificado
 """
-import os
-from typing import Optional, Generator
+from typing import Optional, Generator, Literal
 from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, Session
@@ -11,14 +10,19 @@ from .models.base import Base
 from ..settings import settings
 
 
+DatabaseType = Literal["tdax", "automations"]
+
+
 class DatabaseSessionManager:
     """
-    Gerenciador de sessões SQLAlchemy genérico
+    Gerenciador de sessões SQLAlchemy unificado.
+    Suporta múltiplos bancos de dados através do parâmetro db_type.
     """
     
     def __init__(
         self,
-        database_url: str,
+        db_type: Optional[DatabaseType] = None,
+        database_url: Optional[str] = None,
         echo: bool = False,
         pool_size: int = 5,
         max_overflow: int = 10,
@@ -27,11 +31,23 @@ class DatabaseSessionManager:
         Inicializa o gerenciador de sessões.
         
         Args:
-            database_url: URL de conexão do banco
+            db_type: Tipo do banco ("tdax", "automations" ou None para env)
+            database_url: URL de conexão (sobrescreve db_type)
             echo: Se True, mostra SQL queries no console
             pool_size: Tamanho do pool de conexões
             max_overflow: Conexões extras permitidas
         """
+        # Se não forneceu URL, usa settings baseado em db_type
+        if database_url is None:
+            if db_type == "tdax":
+                database_url = settings.database_url_tdax
+            elif db_type == "automations":
+                database_url = settings.database_url_automation
+            else:
+                # None = usa DATABASE_URL genérico ou tdax como padrão
+                database_url = settings.database_url
+        
+        self.db_type = db_type
         self.database_url = database_url
         
         self.engine = create_engine(
@@ -49,10 +65,6 @@ class DatabaseSessionManager:
             bind=self.engine,
         )
     
-    def create_tables(self):
-        """Cria todas as tabelas baseadas nos models definidos"""
-        Base.metadata.create_all(bind=self.engine)
-    
     def get_session(self) -> Session:
         """Retorna uma nova sessão"""
         return self.SessionLocal()
@@ -63,8 +75,9 @@ class DatabaseSessionManager:
         Context manager para sessão com auto-commit e rollback.
         
         Exemplo:
-            with db_manager.session_scope() as session:
-                user = session.query(User).first()
+            manager = DatabaseSessionManager("tdax")
+            with manager.session_scope() as session:
+                clientes = session.query(Cliente).all()
         """
         session = self.SessionLocal()
         try:
@@ -77,169 +90,133 @@ class DatabaseSessionManager:
             session.close()
 
 
-class TdaxSessionManager(DatabaseSessionManager):
+# ==========================================
+# INSTÂNCIAS GLOBAIS (lazy loading)
+# ==========================================
+
+_managers: dict[Optional[DatabaseType], DatabaseSessionManager] = {}
+
+
+def get_manager(db_type: Optional[DatabaseType] = "tdax") -> DatabaseSessionManager:
     """
-    Gerenciador de sessões para o banco TDAX
-    """
+    Retorna ou cria um gerenciador para o banco especificado.
     
-    def __init__(
-        self,
-        database_url: Optional[str] = None,
-        echo: bool = False,
-        pool_size: int = 5,
-        max_overflow: int = 10,
-    ):
-        """
-        Inicializa o gerenciador de sessões TDAX.
-        
-        Args:
-            database_url: URL de conexão (padrão: TDAX_DATABASE_URL env)
-            echo: Mostrar queries SQL
-            pool_size: Tamanho do pool
-            max_overflow: Conexões extras
-        """
-        if database_url is None:
-            database_url = os.getenv(
-                "TDAX_DATABASE_URL",
-                "postgresql://postgres:postgres@localhost:5432/tdax"
-            )
-        
-        super().__init__(
-            database_url=database_url,
-            echo=echo,
-            pool_size=pool_size,
-            max_overflow=max_overflow,
-        )
-
-
-class AutomationsSessionManager(DatabaseSessionManager):
-    """
-    Gerenciador de sessões para o banco Automations
-    """
+    Args:
+        db_type: "tdax", "automations" ou None
     
-    def __init__(
-        self,
-        database_url: Optional[str] = None,
-        echo: bool = False,
-        pool_size: int = 5,
-        max_overflow: int = 10,
-    ):
-        """
-        Inicializa o gerenciador de sessões Automations.
+    Returns:
+        DatabaseSessionManager configurado
+    
+    Exemplo:
+        manager = get_manager("tdax")
+        with manager.session_scope() as session:
+            ...
+    """
+    if db_type not in _managers:
+        _managers[db_type] = DatabaseSessionManager(db_type=db_type)
+    
+    return _managers[db_type]
+
+
+# ==========================================
+# FUNÇÕES DE CONVENIÊNCIA
+# ==========================================
+
+@contextmanager
+def get_session(
+    db_type: Optional[DatabaseType] = "tdax"
+) -> Generator[Session, None, None]:
+    """
+    Context manager para obter uma sessão.
+    
+    Args:
+        db_type: "tdax", "automations" ou None
+    
+    Exemplo:
+        # TDAX
+        with get_session("tdax") as session:
+            clientes = session.query(Cliente).all()
         
-        Args:
-            database_url: URL de conexão (padrão: AUTOMATIONS_DATABASE_URL env)
-            echo: Mostrar queries SQL
-            pool_size: Tamanho do pool
-            max_overflow: Conexões extras
-        """
-        if database_url is None:
-            database_url = os.getenv(
-                "AUTOMATIONS_DATABASE_URL",
-                "postgresql://postgres:postgres@localhost:5432/automations"
-            )
+        # Automations
+        with get_session("automations") as session:
+            jobs = session.query(Job).all()
         
-        super().__init__(
-            database_url=database_url,
-            echo=echo,
-            pool_size=pool_size,
-            max_overflow=max_overflow,
-        )
+        # Padrão (tdax)
+        with get_session() as session:
+            ...
+    """
+    manager = get_manager(db_type)
+    with manager.session_scope() as session:
+        yield session
 
 
-# Instâncias globais
-_tdax_manager: Optional[TdaxSessionManager] = None
-_automations_manager: Optional[AutomationsSessionManager] = None
-
-
-def get_tdax_manager() -> TdaxSessionManager:
-    """Retorna o gerenciador TDAX"""
-    if _tdax_manager is None:
-        raise RuntimeError(
-            "Banco TDAX não foi inicializado. Chame init_tdax_db() primeiro."
-        )
-    return _tdax_manager
-
-
-def get_automations_manager() -> AutomationsSessionManager:
-    """Retorna o gerenciador Automations"""
-    if _automations_manager is None:
-        raise RuntimeError(
-            "Banco Automations não foi inicializado. Chame init_automations_db() primeiro."
-        )
-    return _automations_manager
-
+# ==========================================
+# ALIASES PARA COMPATIBILIDADE
+# ==========================================
 
 @contextmanager
 def get_tdax_session() -> Generator[Session, None, None]:
-    """
-    Context manager para obter uma sessão TDAX.
-    
-    Exemplo:
-        with get_tdax_session() as session:
-            cliente = session.query(Cliente).filter_by(id=1).first()
-    """
-    manager = get_tdax_manager()
-    with manager.session_scope() as session:
+    """Alias para get_session("tdax")"""
+    with get_session("tdax") as session:
         yield session
 
 
 @contextmanager
 def get_automations_session() -> Generator[Session, None, None]:
-    """
-    Context manager para obter uma sessão Automations.
-    
-    Exemplo:
-        with get_automations_session() as session:
-            job = session.query(AutomationJob).filter_by(id=1).first()
-    """
-    manager = get_automations_manager()
-    with manager.session_scope() as session:
+    """Alias para get_session("automations")"""
+    with get_session("automations") as session:
         yield session
 
 
-# Dependency injection para FastAPI
-def get_tdax_db_dependency() -> Generator[Session, None, None]:
+def get_tdax_manager() -> DatabaseSessionManager:
+    """Alias para get_manager("tdax")"""
+    return get_manager("tdax")
+
+
+def get_automations_manager() -> DatabaseSessionManager:
+    """Alias para get_manager("automations")"""
+    return get_manager("automations")
+
+
+# ==========================================
+# FASTAPI DEPENDENCIES
+# ==========================================
+
+def get_db_dependency(
+    db_type: DatabaseType = "tdax"
+) -> Generator[Session, None, None]:
     """
-    Dependency para usar com FastAPI - TDAX.
+    Dependency genérico para FastAPI.
     
-    Uso no FastAPI:
-        from fastapi import Depends
+    Uso:
+        from functools import partial
         
+        # TDAX
         @app.get("/clientes")
-        def get_clientes(db: Session = Depends(get_tdax_db_dependency)):
+        def get_clientes(db: Session = Depends(get_db_dependency)):
             return db.query(Cliente).all()
+        
+        # Automations
+        get_automations_db = partial(get_db_dependency, db_type="automations")
+        
+        @app.get("/jobs")
+        def get_jobs(db: Session = Depends(get_automations_db)):
+            return db.query(Job).all()
     """
-    manager = get_tdax_manager()
+    manager = get_manager(db_type)
     session = manager.get_session()
     try:
         yield session
     finally:
         session.close()
+
+
+# Aliases específicos
+def get_tdax_db_dependency() -> Generator[Session, None, None]:
+    """FastAPI dependency para TDAX"""
+    return get_db_dependency(db_type="tdax")
 
 
 def get_automations_db_dependency() -> Generator[Session, None, None]:
-    """
-    Dependency para usar com FastAPI - Automations.
-    
-    Uso no FastAPI:
-        from fastapi import Depends
-        
-        @app.get("/jobs")
-        def get_jobs(db: Session = Depends(get_automations_db_dependency)):
-            return db.query(AutomationJob).all()
-    """
-    manager = get_automations_manager()
-    session = manager.get_session()
-    try:
-        yield session
-    finally:
-        session.close()
-
-
-@contextmanager
-def get_session() -> Generator[Session, None, None]:
-    """DEPRECATED: Use get_tdax_session() ou get_automations_session()"""
-    with get_tdax_session() as session:
-        yield session
-
+    """FastAPI dependency para Automations"""
+    return get_db_dependency(db_type="automations")
