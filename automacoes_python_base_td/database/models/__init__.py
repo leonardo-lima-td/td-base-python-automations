@@ -91,5 +91,12 @@ with get_session() as session:
 # Submódulos disponíveis
 from . import tdax
 from . import automations
+from .base import Base, BaseModel
 
-__all__ = ["tdax", "automations"]
+__all__ = [
+    "tdax",
+    "automations",
+    # SQLAlchemy - Base
+    "Base",
+    "BaseModel",
+]

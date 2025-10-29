@@ -5,7 +5,7 @@ import os
 from typing import Optional
 import pika
 from pika.exceptions import AMQPConnectionError
-from ..settings import RabbitMQSettings
+from ..settings import settings
 from ..core.exceptions import RabbitMQConnectionError
 
 
@@ -21,21 +21,17 @@ class RabbitMQConnection:
         username: Optional[str] = None,
         password: Optional[str] = None,
         virtual_host: Optional[str] = None,
-        settings: Optional[RabbitMQSettings] = None,
     ):
-        """Inicializa a conexão com RabbitMQ"""
-        if settings:
-            self.host = host or settings.rabbitmq_host
-            self.port = port or settings.rabbitmq_port
-            self.username = username or settings.rabbitmq_user
-            self.password = password or settings.rabbitmq_password
-            self.virtual_host = virtual_host or settings.rabbitmq_vhost
-        else:
-            self.host = host or os.getenv("RABBITMQ_HOST", "localhost")
-            self.port = port or int(os.getenv("RABBITMQ_PORT", "5672"))
-            self.username = username or os.getenv("RABBITMQ_USER", "guest")
-            self.password = password or os.getenv("RABBITMQ_PASSWORD", "guest")
-            self.virtual_host = virtual_host or os.getenv("RABBITMQ_VHOST", "/")
+        """
+        Inicializa a conexão com RabbitMQ.
+        Se não fornecidos, usa valores do settings global.
+        """
+        # Usa settings global como fallback (se rabbit_usage=True)
+        self.host = host or (settings.rabbitmq_host if settings.rabbit_usage else "localhost")
+        self.port = port or (settings.rabbitmq_port if settings.rabbit_usage else 5672)
+        self.username = username or (settings.rabbitmq_user if settings.rabbit_usage else "guest")
+        self.password = password or (settings.rabbitmq_password if settings.rabbit_usage else "guest")
+        self.virtual_host = virtual_host or (settings.rabbitmq_vhost if settings.rabbit_usage else "/")
         
         self.connection = None
         self.channel = None

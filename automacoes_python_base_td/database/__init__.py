@@ -11,8 +11,10 @@ from .connection import (
     DatabaseConnection,
 )
 
-# SQLAlchemy
-from .base import Base, BaseModel
+# SQLAlchemy - Base e BaseModel
+from .models.base import Base, BaseModel
+
+# SQLAlchemy - Session Managers
 from .session import (
     # Gerenciadores
     DatabaseSessionManager,
@@ -38,8 +40,8 @@ from .session import (
     get_db_dependency,
 )
 
-# Queries CRUD
-from .queries import CRUDBase, crud_factory
+# Repositories CRUD
+from .repositories import CRUDBase, crud_factory
 
 __all__ = [
     # PostgreSQL

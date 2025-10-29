@@ -35,15 +35,11 @@ from .core import (
 )
 
 # ===================================
-# Settings (Pydantic)
+# Settings (Pydantic v2 - Unificado)
 # ===================================
 from .settings import (
-    BaseAppSettings,
-    DatabaseSettings,
-    AWSSettings,
-    RabbitMQSettings,
-    LoggerSettings,
-    get_settings,
+    AppSettings,
+    settings,
 )
 
 # ===================================
@@ -154,12 +150,8 @@ __all__ = [
     "NotFoundError",
     "AlreadyExistsError",
     # Settings
-    "BaseAppSettings",
-    "DatabaseSettings",
-    "AWSSettings",
-    "RabbitMQSettings",
-    "LoggerSettings",
-    "get_settings",
+    "AppSettings",
+    "settings",
     # Database - PostgreSQL
     "get_connection",
     "execute_query",

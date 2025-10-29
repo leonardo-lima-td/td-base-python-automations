@@ -6,7 +6,7 @@ from typing import Optional, List, Tuple, Any, Dict
 from contextlib import contextmanager
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from ..settings import DatabaseSettings
+from ..settings import settings
 from ..core.exceptions import DatabaseConnectionError, DatabaseQueryError
 
 
@@ -22,23 +22,17 @@ class DatabaseConnection:
         database: Optional[str] = None,
         user: Optional[str] = None,
         password: Optional[str] = None,
-        settings: Optional[DatabaseSettings] = None,
     ):
         """
         Inicializa a conexão com o banco de dados.
+        Se não fornecidos, usa valores do settings global.
         """
-        if settings:
-            self.host = host or settings.db_host
-            self.port = port or settings.db_port
-            self.database = database or settings.db_name
-            self.user = user or settings.db_user
-            self.password = password or settings.db_password
-        else:
-            self.host = host or os.getenv("DB_HOST", "localhost")
-            self.port = port or int(os.getenv("DB_PORT", "5432"))
-            self.database = database or os.getenv("DB_NAME", "postgres")
-            self.user = user or os.getenv("DB_USER", "postgres")
-            self.password = password or os.getenv("DB_PASSWORD", "")
+        # Usa settings global como fallback
+        self.host = host or settings.db_host
+        self.port = port or settings.db_port
+        self.database = database or settings.db_name
+        self.user = user or settings.db_user
+        self.password = password or settings.db_password
         
         self._connection = None
     

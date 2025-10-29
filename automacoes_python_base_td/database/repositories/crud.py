@@ -4,7 +4,7 @@ CRUD genérico para qualquer model SQLAlchemy (plug and play)
 from typing import TypeVar, Generic, Type, Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
-from ..base import Base
+from ..models.base import Base
 from ...core.exceptions import DatabaseQueryError, ModelNotFoundError
 
 

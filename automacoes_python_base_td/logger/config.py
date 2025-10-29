@@ -5,29 +5,28 @@ import os
 import sys
 from typing import Optional
 from loguru import logger
-from ..settings import LoggerSettings
+from ..settings import settings
 
 
 def setup_logger(
-    log_level: str = "INFO",
+    log_level: Optional[str] = None,
     format_string: Optional[str] = None,
-    settings: Optional[LoggerSettings] = None,
 ) -> None:
     """
     Configura o logger com Loguru (apenas console).
     
     Args:
-        log_level: Nível de log (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        log_level: Nível de log (DEBUG, INFO, WARNING, ERROR, CRITICAL). Se None, usa settings.effective_log_level
         format_string: Formato customizado do log
-        settings: Objeto LoggerSettings (opcional)
     
     Exemplo:
         setup_logger(log_level="DEBUG")
     """
-    if settings:
-        log_level = settings.log_level
-        if settings.log_format != "default":
-            format_string = settings.log_format
+    # Usa settings global se não fornecido
+    if log_level is None:
+        log_level = settings.effective_log_level
+    if format_string is None and settings.log_format != "default":
+        format_string = settings.log_format
     
     # Remove handlers padrão
     logger.remove()
