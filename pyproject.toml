@@ -41,6 +41,9 @@ dev = [
     "flake8>=6.0.0",
 ]
 
+[project.scripts]
+td-init = "automacoes_python_base_td.cli:main"
+
 [project.urls]
 Homepage = "https://github.com/td-company/automacoes-python-base-td"
 Repository = "https://github.com/td-company/automacoes-python-base-td"

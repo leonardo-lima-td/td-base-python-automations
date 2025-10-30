@@ -1,0 +1,128 @@
+# Project folders
+files/
+temp/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+.virtualenv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.iml
+
+# Testing
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.hypothesis/
+pytest.ini
+.coveragerc
+run_tests.sh
+
+# Documentation
+*.md
+README*
+LICENSE
+CHANGELOG*
+docs/
+*.txt
+!requirements.txt
+
+# Logs
+*.log
+logs/
+
+# Environment variables (examples are OK, but not actual .env)
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.bak
+*~
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pytype/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pyenv
+.python-version
+
+# pipenv/poetry
+Pipfile.lock
+poetry.lock
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+
+# Build scripts
+build.sh
+setup.py
+MANIFEST.in
+pyproject.toml
+
+# Project specific
+htmlcov/
+PROJECT_STRUCTURE.txt
+quick_start/
+

@@ -136,6 +136,13 @@ from .utils import (
 )
 
 # ===================================
+# CLI (Project Initialization)
+# ===================================
+from .cli import (
+    init_project,
+)
+
+# ===================================
 # Exportações públicas
 # ===================================
 __all__ = [
@@ -226,4 +233,6 @@ __all__ = [
     "format_timestamp",
     "parse_date",
     "days_between",
+    # CLI
+    "init_project",
 ]

@@ -1,0 +1,6 @@
+# Pacote base TD
+automacoes-python-base-td>=0.1.0
+
+# Adicione suas dependências específicas abaixo:
+# pandas>=2.0.0
+# requests>=2.31.0
