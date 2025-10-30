@@ -28,9 +28,29 @@ Exemplo:
 """
 
 # Importe seus models do TDAX aqui
-# from .cliente import Cliente
-# from .produto import Produto
-# from .pedido import Pedido
+from .auto_dctf_download import DctfDownloadAll, DctfDownloadUnit
+from .auto_dctf_retificacoes import DctfRetificacao
+from .certificate import Certificates
+from .empresas import Empresas
+from .organizacoes import Organizacoes
+from .privilegios import Privilegios
+from .session_gov import SessionGov
+from .payments import Payment
+from .sped import Sped
+from .speds_retificados import SpedRetificado
+from .users import Users
 
-__all__ = []
-
+__all__ = [
+    'Certificates',
+    'DctfRetificacao',
+    'DctfDownloadAll',
+    'DctfDownloadUnit',
+    'Empresas',
+    'Organizacoes',
+    'Payment',
+    'Privilegios',
+    'SessionGov',
+    'Sped',
+    'SpedRetificado',
+    'Users',
+]

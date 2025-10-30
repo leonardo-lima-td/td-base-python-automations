@@ -80,7 +80,7 @@ logger = get_logger()
 logger.info(f"App: {settings.app_name}")
 logger.info(f"Ambiente: {settings.env}")
 
-if settings.is_production():
+if settings.is_production:
     logger.warning("⚠️ Rodando em PRODUÇÃO!")
 else:
     logger.info("🔧 Ambiente de desenvolvimento")

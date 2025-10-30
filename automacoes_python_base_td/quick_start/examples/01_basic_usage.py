@@ -24,9 +24,9 @@ logger.info(f"🐛 Debug Mode: {settings.debug_mode}")
 logger.info(f"💾 Database: {settings.db_name}")
 
 # Verificar ambiente
-if settings.is_production():
+if settings.is_production:
     logger.warning("⚠️  ATENÇÃO: Rodando em PRODUÇÃO!")
-elif settings.is_development():
+elif settings.is_development:
     logger.info("🔧 Ambiente de DESENVOLVIMENTO")
 else:
     logger.info(f"🔧 Ambiente: {settings.env.upper()}")

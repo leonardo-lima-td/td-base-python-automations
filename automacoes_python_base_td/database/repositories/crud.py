@@ -126,33 +126,6 @@ class CRUDBase(Generic[ModelType]):
                 query = query.filter(getattr(self.model, key) == value)
         return query.offset(skip).limit(limit).all()
     
-    def create(self, session: Session, data: Dict[str, Any]) -> ModelType:
-        """
-        Cria um novo registro.
-        
-        Args:
-            session: Sessão SQLAlchemy
-            data: Dicionário com os dados
-        
-        Returns:
-            Instância do model criada
-        
-        Exemplo:
-            user = user_crud.create(session, {"name": "João", "email": "joao@example.com"})
-        """
-        try:
-            obj = self.model(**data)
-            session.add(obj)
-            session.commit()
-            session.refresh(obj)
-            return obj
-        except SQLAlchemyError as e:
-            session.rollback()
-            raise DatabaseQueryError(
-                f"Erro ao criar {self.model.__name__}",
-                details={"model": self.model.__name__, "data": data, "error": str(e)}
-            ) from e
-    
     def create_many(self, session: Session, data_list: List[Dict[str, Any]]) -> List[ModelType]:
         """
         Cria múltiplos registros.
@@ -175,44 +148,61 @@ class CRUDBase(Generic[ModelType]):
             session.rollback()
             raise e
     
-    def update(
+    def upsert(
         self,
         session: Session,
-        id: int,
-        data: Dict[str, Any]
-    ) -> Optional[ModelType]:
+        data: Dict[str, Any],
+        id: Optional[int] = None,
+        **filters
+    ) -> ModelType:
         """
-        Atualiza um registro.
+        Insert or Update (upsert).
         
         Args:
             session: Sessão SQLAlchemy
-            id: ID do registro
-            data: Dicionário com os dados para atualizar
+            data: Dicionário com os dados
+            id: ID do registro (opcional)
+            **filters: Filtros para buscar registro existente (ex: email="joao@example.com")
         
         Returns:
-            Instância do model atualizada ou None
+            Instância do model criada ou atualizada
         
         Exemplo:
-            user = user_crud.update(session, 1, {"name": "João Silva"})
+            # Por ID
+            user = user_crud.upsert(session, {"name": "João Silva", "email": "joao@example.com"}, id=1)
+            
+            # Por filtro único (email)
+            user = user_crud.upsert(session, {"name": "João Silva"}, email="joao@example.com")
         """
         try:
-            obj = self.get(session, id)
-            if not obj:
-                raise ModelNotFoundError(self.model.__name__, id)
+            # Buscar registro existente
+            obj = None
             
-            for key, value in data.items():
-                if hasattr(obj, key):
-                    setattr(obj, key, value)
+            if id is not None:
+                obj = self.get(session, id)
+            elif filters:
+                results = self.filter(session, limit=1, **filters)
+                obj = results[0] if results else None
+            
+            if obj:
+                # UPDATE
+                for key, value in data.items():
+                    if hasattr(obj, key):
+                        setattr(obj, key, value)
+            else:
+                # CREATE
+                obj = self.model(**data)
+                session.add(obj)
+            
             session.commit()
             session.refresh(obj)
             return obj
-        except ModelNotFoundError:
-            raise
+            
         except SQLAlchemyError as e:
             session.rollback()
             raise DatabaseQueryError(
-                f"Erro ao atualizar {self.model.__name__}",
-                details={"model": self.model.__name__, "id": id, "data": data, "error": str(e)}
+                f"Erro ao fazer upsert em {self.model.__name__}",
+                details={"model": self.model.__name__, "id": id, "filters": filters, "data": data, "error": str(e)}
             ) from e
     
     def delete(self, session: Session, id: int) -> bool:
