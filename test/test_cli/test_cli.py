@@ -48,14 +48,16 @@ class TestCLI:
         assert (project_path / ".gitignore").exists()
 
         # Verificar diretórios criados
-        assert (project_path / "scripts").is_dir()
         assert (project_path / "logs").is_dir()
         assert (project_path / "data").is_dir()
+        assert (project_path / "files").is_dir()
+        assert (project_path / "temp").is_dir()
 
         # Verificar .gitkeep
-        assert (project_path / "scripts" / ".gitkeep").exists()
         assert (project_path / "logs" / ".gitkeep").exists()
         assert (project_path / "data" / ".gitkeep").exists()
+        assert (project_path / "files" / ".gitkeep").exists()
+        assert (project_path / "temp" / ".gitkeep").exists()
 
         # Verificar que models/ NÃO foi criado
         assert not (project_path / "models").exists()
@@ -75,7 +77,9 @@ class TestCLI:
             assert (tmp_path / "README.md").exists()
             assert not (tmp_path / ".env").exists()
             assert (tmp_path / "requirements.txt").exists()
-            assert (tmp_path / "scripts").is_dir()
+            assert (tmp_path / "logs").is_dir()
+            assert (tmp_path / "files").is_dir()
+            assert (tmp_path / "temp").is_dir()
 
         finally:
             os.chdir(old_cwd)
@@ -99,12 +103,11 @@ class TestCLI:
         gitignore_file = project_path / ".gitignore"
         content = gitignore_file.read_text()
 
-        # Verificar entradas importantes
+        # Verificar entradas importantes do quick_start/.gitignore
         assert ".env" in content
         assert "*.log" in content
         assert "__pycache__/" in content
         assert "venv/" in content
-        assert "data/" in content
         assert "logs/" in content
         assert "files/" in content
         assert "temp/" in content
@@ -121,7 +124,7 @@ class TestCLI:
         assert env_example.exists()
         assert not env_file.exists()
 
-    def test_requirements_append_existing(self, tmp_path):
+    def test_requirements_append_existing(self, tmp_path, monkeypatch):
         """Testa append em requirements.txt existente"""
         project_path = tmp_path / "test_req_append"
         project_path.mkdir()
@@ -129,6 +132,9 @@ class TestCLI:
         # Criar requirements.txt existente
         req_file = project_path / "requirements.txt"
         req_file.write_text("pandas>=2.0.0\nrequests>=2.31.0\n")
+
+        # Mockar input para responder 's' (sim) automaticamente
+        monkeypatch.setattr('builtins.input', lambda _: 's')
 
         # Executar init_project
         init_project([str(project_path)])
@@ -139,7 +145,7 @@ class TestCLI:
         assert "requests>=2.31.0" in content  # Conteúdo original
         assert "automacoes-python-base-td>=0.1.0" in content  # Novo
 
-    def test_gitignore_append_existing(self, tmp_path):
+    def test_gitignore_append_existing(self, tmp_path, monkeypatch):
         """Testa append em .gitignore existente"""
         project_path = tmp_path / "test_git_append"
         project_path.mkdir()
@@ -147,6 +153,9 @@ class TestCLI:
         # Criar .gitignore existente
         git_file = project_path / ".gitignore"
         git_file.write_text("*.pyc\n__pycache__/\n")
+
+        # Mockar input para responder 's' (sim) automaticamente
+        monkeypatch.setattr('builtins.input', lambda _: 's')
 
         # Executar init_project
         init_project([str(project_path)])
@@ -212,9 +221,10 @@ class TestCLI:
         # Diretórios obrigatórios
         required_dirs = [
             "examples",
-            "scripts",
             "logs",
             "data",
+            "files",
+            "temp",
         ]
 
         for dirname in required_dirs:

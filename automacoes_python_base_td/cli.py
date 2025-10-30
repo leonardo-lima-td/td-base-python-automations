@@ -57,6 +57,15 @@ def init_project(args=None):
 
     print(f"\nValidando arquivos de configuração...")
 
+    # Configurar .env
+    env_path = project_path / ".env"
+    
+    if not env_path.exists():
+        shutil.copy2(quick_start / "env.example", env_path)
+        print(f"   • .env (Criado a partir de env.example)")
+    else:
+        print(f"   • .env (Arquivo existente, não alterado)")
+
     # Configurar requirements.txt
     requirements_path = project_path / "requirements.txt"
     requirements_append = "\n\n# Pacote base TD\nautomacoes-python-base-td>=0.1.0\n"

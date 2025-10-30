@@ -1,21 +1,16 @@
+# Include package data
+recursive-include automacoes_python_base_td/quick_start *
+recursive-include automacoes_python_base_td/quick_start/examples *
+
+# Include hidden files (dotfiles)
+graft automacoes_python_base_td/quick_start
+
 # Include documentation
 include README.md
-include CHANGELOG.md
 include LICENSE
 
-# Include configuration files
-include pyproject.toml
-include pytest.ini
-
-# Include example files
-include example_*.py
-
-# Exclude tests from distribution
-recursive-exclude tests *
-recursive-exclude tests .*
-
-# Exclude build and cache files
+# Exclude compiled files
+global-exclude *.py[cod]
 global-exclude __pycache__
-global-exclude *.py[co]
 global-exclude *.so
 global-exclude .DS_Store
