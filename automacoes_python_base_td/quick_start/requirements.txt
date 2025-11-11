@@ -1,5 +1,11 @@
 # Pacote base TD
-automacoes-python-base-td>=0.1.0
+automacoes-python-base-td>=0.2.0
+
+# Dependências de desenvolvimento (opcional)
+# pytest>=7.0.0
+# pytest-cov>=4.0.0
+# ruff>=0.1.0
+# taskipy>=1.12.0
 
 # Adicione suas dependências específicas abaixo:
 # pandas>=2.0.0

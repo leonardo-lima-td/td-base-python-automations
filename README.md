@@ -10,20 +10,53 @@ Pacote Python modular e profissional com funcionalidades para Database (PostgreS
 
 ## 📦 Instalação
 
-### Instalação Local (Desenvolvimento)
+### Gerenciamento de Versões Python
+
+Este projeto suporta múltiplas formas de gerenciamento de versões Python:
+
+#### Usando pyenv (Recomendado)
+
+```bash
+# Instalar Python 3.12 (ou superior)
+pyenv install 3.12
+
+# O arquivo .python-version na raiz do projeto define automaticamente a versão
+cd /home/vitorio/Desktop/Pessoal/python-base-TD
+python --version  # Deve mostrar Python 3.12.x
+```
+
+### Instalação com Poetry
+
+```bash
+# Instalar Poetry (se ainda não tiver)
+curl -sSL https://install.python-poetry.org | python3 -
+
+# Instalar dependências
+poetry install
+
+# Instalar com dependências de desenvolvimento
+poetry install --with dev
+
+# Ativar o ambiente virtual
+poetry shell
+```
+
+### Instalação com pip
+
+#### Instalação Local (Desenvolvimento)
 
 ```bash
 cd /home/vitorio/Desktop/Pessoal/python-base-TD
 pip install -e .
 ```
 
-### Instalação via Git
+#### Instalação via Git
 
 ```bash
 pip install git+https://github.com/sua-empresa/automacoes-python-base-td.git
 ```
 
-### Instalação via Arquivo .whl
+#### Instalação via Arquivo .whl
 
 ```bash
 # 1. Construir o pacote
@@ -31,7 +64,7 @@ pip install build
 python -m build
 
 # 2. Instalar
-pip install dist/automacoes_python_base_td-0.1.0-py3-none-any.whl
+pip install dist/automacoes_python_base_td-0.2.0-py3-none-any.whl
 ```
 
 ### Dependências
@@ -48,10 +81,14 @@ O pacote instalará automaticamente:
 ### Dependências de Desenvolvimento
 
 ```bash
+# Com pip
 pip install -e ".[dev]"
+
+# Com poetry
+poetry install --with dev
 ```
 
-Inclui: pytest, black, flake8
+Inclui: pytest, pytest-cov, black, flake8, ruff, taskipy
 
 ---
 
@@ -293,6 +330,88 @@ pytest tests/test_settings.py
 
 ---
 
+## 🛠️ Ferramentas de Desenvolvimento
+
+### Taskipy - Gerenciador de Tarefas
+
+O projeto usa Taskipy para automatizar tarefas comuns. Após instalar as dependências de desenvolvimento, você pode usar:
+
+```bash
+# Formatar código automaticamente
+task format
+
+# Verificar formatação (sem modificar)
+task format-check
+
+# Executar linter
+task lint
+
+# Executar testes
+task test
+
+# Executar testes com cobertura
+task test-cov
+
+# Limpar arquivos temporários (__pycache__, .pyc)
+task clean
+
+# Construir o pacote
+task build
+
+# Instalar em modo desenvolvimento
+task install-dev
+
+# Executar todas as verificações (format + lint + test)
+task all-checks
+```
+
+### Ruff - Linter e Formatter
+
+Ruff é um linter e formatter extremamente rápido para Python. Ele substitui múltiplas ferramentas (Black, isort, flake8, etc.) em uma única ferramenta.
+
+#### Uso Manual
+
+```bash
+# Verificar erros de linting
+ruff check .
+
+# Verificar e corrigir automaticamente
+ruff check --fix .
+
+# Formatar código
+ruff format .
+
+# Verificar formatação sem modificar
+ruff format --check .
+```
+
+#### Configuração
+
+O Ruff está configurado no `pyproject.toml` com:
+- Comprimento máximo de linha: 100 caracteres
+- Python alvo: 3.8+
+- Regras ativas: pycodestyle, pyflakes, isort, pep8-naming, pyupgrade, flake8-bugbear, flake8-comprehensions
+
+#### Integração com Editor
+
+**VS Code:** Instale a extensão "Ruff" da marketplace
+
+```json
+// .vscode/settings.json
+{
+    "editor.formatOnSave": true,
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    }
+}
+```
+
+**PyCharm:** Configure em Settings → Tools → External Tools
+
+**Vim/Neovim:** Use o plugin `vim-ruff` ou configure com ALE/LSP
+
+---
+
 ## 🔧 Desenvolvimento
 
 ### Instalar em Modo Desenvolvimento
@@ -312,6 +431,32 @@ pip install -e ".[dev]"
 ├── pyproject.toml              # Configuração do pacote
 └── README.md                   # Este arquivo
 ```
+
+### Usar o Template Quick Start
+
+O diretório `quick_start` contém um template completo para iniciar seu projeto:
+
+```bash
+# 1. Copiar o template
+cp -r automacoes_python_base_td/quick_start meu-novo-projeto
+cd meu-novo-projeto
+
+# 2. Personalizar o pyproject.toml
+# Edite e altere: name, authors, dependencies
+
+# 3. Instalar dependências
+poetry install  # ou pip install -e ".[dev]"
+
+# 4. Começar a desenvolver!
+```
+
+O template inclui:
+- ✅ `pyproject.toml` - Configuração completa com Taskipy, Ruff, pytest
+- ✅ `.python-version` - Versão Python para pyenv
+- ✅ `env.example` - Template de variáveis de ambiente
+- ✅ `requirements.txt` - Alternativa ao pyproject.toml
+- ✅ `examples/` - Exemplos práticos de uso
+- ✅ `.gitignore`, `.dockerignore` - Arquivos auxiliares
 
 ### Adicionar Novas Funcionalidades
 

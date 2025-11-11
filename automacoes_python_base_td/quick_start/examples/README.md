@@ -61,6 +61,7 @@ Agora é só importar e usar! Veja os exemplos abaixo.
 | **06** | Sistema de logs | [06_logger.py](06_logger.py) |
 | **07** | Utilitários diversos | [07_utils.py](07_utils.py) |
 | **08** | Tratamento de erros | [08_exceptions.py](08_exceptions.py) |
+| **09** | Taskipy - Automação de Tarefas | [09_taskipy.py](09_taskipy.py) |
 
 ---
 

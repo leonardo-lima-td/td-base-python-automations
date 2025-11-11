@@ -1,0 +1,142 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "meu-projeto-td"  # ALTERE PARA O NOME DO SEU PROJETO
+version = "0.1.0"
+description = "Projeto baseado em automacoes-python-base-td"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Seu Nome", email = "seu.email@example.com"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "automacoes-python-base-td>=0.2.0",
+    # Adicione suas dependências aqui
+    # "pandas>=2.0.0",
+    # "requests>=2.31.0",
+    # "fastapi>=0.104.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "taskipy>=1.12.0",
+]
+
+[project.scripts]
+# Defina seus comandos CLI aqui
+# meu-comando = "meu_modulo.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["meu_projeto*"]  # ALTERE PARA O NOME DO SEU PACOTE
+exclude = ["tests*", "*.tests", "*.tests.*", "test*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+exclude = [
+    ".git",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "*.egg-info",
+    "__pycache__",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.taskipy.tasks]
+# Tarefas de formatação e linting
+lint = "ruff check ."
+lint-fix = "ruff check --fix ."
+format = "ruff format ."
+format-check = "ruff format --check ."
+
+# Tarefas de teste
+test = "pytest -v"
+test-cov = "pytest --cov=. --cov-report=html --cov-report=term"
+test-watch = "pytest --watch"
+
+# Tarefas de limpeza
+clean = "find . -type d -name '__pycache__' -exec rm -rf {} + && find . -type f -name '*.pyc' -delete && rm -rf .pytest_cache .coverage htmlcov dist build *.egg-info"
+
+# Tarefas de build
+build = "python -m build"
+install = "pip install -e ."
+install-dev = "pip install -e '.[dev]'"
+
+# Tarefas compostas
+pre-commit = "task format && task lint && task test"
+all-checks = "task format-check && task lint && task test"
+prepare-release = "task clean && task all-checks && task build"
+
+# Exemplos de tarefas customizadas para seu projeto
+# run-dev = "python -m uvicorn main:app --reload"
+# run-worker = "python -m celery -A worker worker --loglevel=info"
+# migrate = "alembic upgrade head"
+# seed = "python scripts/seed_database.py"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]
+
